@@ -11,6 +11,7 @@ __pycache__/
 !.vscode/extensions.json
 .idea/
 .DS_Store
+.claude/
 
 # Local SQLite data (lives outside the repo by default, but ignore if ever local)
 *.db
