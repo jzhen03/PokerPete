@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from functools import lru_cache
 from pathlib import Path
 
 from pokerpete.engine import equity, ranges
@@ -61,3 +62,15 @@ def save_matrix(matrix: dict[str, dict[str, float]], path: Path = DEFAULT_DATA_P
 def load_matrix(path: Path = DEFAULT_DATA_PATH) -> dict[str, dict[str, float]]:
     with path.open() as f:
         return json.load(f)
+
+
+@lru_cache(maxsize=1)
+def default_matrix() -> dict[str, dict[str, float]]:
+    """The committed matrix artifact, loaded once per process."""
+    return load_matrix()
+
+
+@lru_cache(maxsize=1)
+def default_weights() -> dict[str, float]:
+    """Combo-count weight per hand class, computed once per process."""
+    return {c: class_weight(c) for c in canonical_hand_classes()}

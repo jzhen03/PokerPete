@@ -251,6 +251,17 @@ range export/sharing, desktop packaging (Tauri), optional multi-user mode.
 - 169-hand (not 1326-combo) abstraction in the deeper-stack solver loses
   blocker information for bluff-combo selection — documented limitation, not
   silently accepted.
+- **Confirmed (Phase 4), not just anticipated:** the open/3bet/shove tree
+  solver's 100%-equity-realization assumption (a plain call is scored as an
+  immediate showdown on the pot as it stands, with no postflop skill or
+  implied-odds value) makes its equilibria lean heavily toward maximal
+  aggression once ahead — verified by hand-checking terminal EVs, not a bug.
+  BB's response to an open is very often a shove rather than a smaller
+  3bet, and SB's response to a 3bet is very often a shove rather than a
+  flat call, well beyond what real HU cash players would do. This is a real
+  consequence of not modeling postflop play, not an implementation error;
+  the API and frontend surface an explicit caveat on every tree-solver
+  response so it's never mistaken for real GTO strategy at these stacks.
 - Postflop analysis is heuristic, not a true solve — must be UI-labeled as
   such so it's never mistaken for solver-grade output.
 - Hand history parsing is fragile per site format — MVP scopes to one format

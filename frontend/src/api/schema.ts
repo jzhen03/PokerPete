@@ -55,6 +55,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/solver/preflop-tree": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Solve Preflop Tree Route */
+        post: operations["solve_preflop_tree_route_solver_preflop_tree_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/trainer/push-fold/spot": {
         parameters: {
             query?: never;
@@ -83,6 +100,40 @@ export interface paths {
         put?: never;
         /** Grade Spot */
         post: operations["grade_spot_trainer_push_fold_grade_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/trainer/preflop-tree/spot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Tree Spot */
+        get: operations["get_tree_spot_trainer_preflop_tree_spot_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/trainer/preflop-tree/grade": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Grade Tree Spot */
+        post: operations["grade_tree_spot_trainer_preflop_tree_grade_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -142,6 +193,60 @@ export interface components {
         HTTPValidationError: {
             /** Detail */
             detail?: components["schemas"]["ValidationError"][];
+        };
+        /** PreflopTreeRequest */
+        PreflopTreeRequest: {
+            /** Stack Bb */
+            stack_bb: number;
+        };
+        /** PreflopTreeResponse */
+        PreflopTreeResponse: {
+            /** Stack Bb */
+            stack_bb: number;
+            /** Open Size Bb */
+            open_size_bb: number;
+            /** Threebet Size Bb */
+            threebet_size_bb: number;
+            /** Iterations */
+            iterations: number;
+            /** Sb Root */
+            sb_root: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            /** Bb Vs Open */
+            bb_vs_open: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            /** Sb Vs 3Bet */
+            sb_vs_3bet: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            /** Bb Vs Shove */
+            bb_vs_shove: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            /** Sb Vs Shove After Open */
+            sb_vs_shove_after_open: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            /** Bb Vs Shove After 3Bet */
+            bb_vs_shove_after_3bet: {
+                [key: string]: {
+                    [key: string]: number;
+                };
+            };
+            /** Caveat */
+            caveat: string;
         };
         /** PushFoldGradeRequest */
         PushFoldGradeRequest: {
@@ -209,6 +314,43 @@ export interface components {
             };
             /** Combo Count */
             combo_count: number;
+        };
+        /** TreeGradeRequest */
+        TreeGradeRequest: {
+            /** Stack Bb */
+            stack_bb: number;
+            /** Hero Class */
+            hero_class: string;
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "fold" | "open" | "shove";
+        };
+        /** TreeGradeResponse */
+        TreeGradeResponse: {
+            /** Correct */
+            correct: boolean;
+            /**
+             * Correct Action
+             * @enum {string}
+             */
+            correct_action: "fold" | "open" | "shove";
+            /** Action Frequencies */
+            action_frequencies: {
+                [key: string]: number;
+            };
+            /** Caveat */
+            caveat: string;
+        };
+        /** TreeSpotResponse */
+        TreeSpotResponse: {
+            /** Stack Bb */
+            stack_bb: number;
+            /** Hero Class */
+            hero_class: string;
+            /** Hero Combo */
+            hero_combo: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -331,6 +473,39 @@ export interface operations {
             };
         };
     };
+    solve_preflop_tree_route_solver_preflop_tree_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreflopTreeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreflopTreeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     get_spot_trainer_push_fold_spot_get: {
         parameters: {
             query?: never;
@@ -371,6 +546,59 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["PushFoldGradeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_tree_spot_trainer_preflop_tree_spot_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TreeSpotResponse"];
+                };
+            };
+        };
+    };
+    grade_tree_spot_trainer_preflop_tree_grade_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TreeGradeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TreeGradeResponse"];
                 };
             };
             /** @description Validation Error */
