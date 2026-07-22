@@ -1,5 +1,14 @@
 from pokerpete.engine.cards import Card
-from pokerpete.engine.ranges import combo_count, intersect, parse, remove_blockers, scale, union
+from pokerpete.engine.ranges import (
+    class_weights,
+    combo_count,
+    hand_class_of,
+    intersect,
+    parse,
+    remove_blockers,
+    scale,
+    union,
+)
 
 
 def test_parse_pocket_pair_has_six_combos() -> None:
@@ -60,3 +69,26 @@ def test_remove_blockers_drops_conflicting_combos() -> None:
     # 3 of the 6 AA combos include the As card and should be removed.
     assert len(r) == 3
     assert all(Card.from_str("As") not in combo for combo in r)
+
+
+def test_hand_class_of_pair() -> None:
+    assert hand_class_of(frozenset({Card.from_str("As"), Card.from_str("Ad")})) == "AA"
+
+
+def test_hand_class_of_suited() -> None:
+    assert hand_class_of(frozenset({Card.from_str("As"), Card.from_str("Ks")})) == "AKs"
+
+
+def test_hand_class_of_offsuit() -> None:
+    assert hand_class_of(frozenset({Card.from_str("Ks"), Card.from_str("Ad")})) == "AKo"
+
+
+def test_class_weights_full_class() -> None:
+    assert class_weights(parse("AA,AKs")) == {"AA": 1.0, "AKs": 1.0}
+
+
+def test_class_weights_partial_class_after_blocker_removal() -> None:
+    # Each of AKs's 4 combos uses a distinct suit, so removing two aces
+    # kills exactly 2 of the 4 combos (As-Ks and Ad-Kd).
+    r = remove_blockers(parse("AKs"), [Card.from_str("As"), Card.from_str("Ad")])
+    assert class_weights(r) == {"AKs": 0.5}

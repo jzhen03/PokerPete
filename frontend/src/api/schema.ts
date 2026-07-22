@@ -4,6 +4,91 @@
  */
 
 export interface paths {
+    "/ranges/parse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Parse Range */
+        post: operations["parse_range_ranges_parse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/equity/calculate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Calculate Equity */
+        post: operations["calculate_equity_equity_calculate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/solver/push-fold": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Solve Push Fold Route */
+        post: operations["solve_push_fold_route_solver_push_fold_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/trainer/push-fold/spot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Spot */
+        get: operations["get_spot_trainer_push_fold_spot_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/trainer/push-fold/grade": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Grade Spot */
+        post: operations["grade_spot_trainer_push_fold_grade_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/health": {
         parameters: {
             query?: never;
@@ -24,7 +109,121 @@ export interface paths {
 }
 export type webhooks = Record<string, never>;
 export interface components {
-    schemas: never;
+    schemas: {
+        /** EquityRequest */
+        EquityRequest: {
+            /** Hero */
+            hero: string;
+            /** Villain */
+            villain: string;
+            /**
+             * Board
+             * @default
+             */
+            board: string;
+            /**
+             * Iterations
+             * @default 5000
+             */
+            iterations: number;
+        };
+        /** EquityResponse */
+        EquityResponse: {
+            /** Win */
+            win: number;
+            /** Tie */
+            tie: number;
+            /** Lose */
+            lose: number;
+            /** Equity */
+            equity: number;
+        };
+        /** HTTPValidationError */
+        HTTPValidationError: {
+            /** Detail */
+            detail?: components["schemas"]["ValidationError"][];
+        };
+        /** PushFoldGradeRequest */
+        PushFoldGradeRequest: {
+            /** Stack Bb */
+            stack_bb: number;
+            /** Hero Class */
+            hero_class: string;
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "shove" | "fold";
+        };
+        /** PushFoldGradeResponse */
+        PushFoldGradeResponse: {
+            /** Correct */
+            correct: boolean;
+            /**
+             * Correct Action
+             * @enum {string}
+             */
+            correct_action: "shove" | "fold";
+            /** Shove Frequency */
+            shove_frequency: number;
+        };
+        /** PushFoldRequest */
+        PushFoldRequest: {
+            /** Stack Bb */
+            stack_bb: number;
+        };
+        /** PushFoldResponse */
+        PushFoldResponse: {
+            /** Stack Bb */
+            stack_bb: number;
+            /** Iterations */
+            iterations: number;
+            /** Sb Shove Frequency */
+            sb_shove_frequency: {
+                [key: string]: number;
+            };
+            /** Bb Call Frequency */
+            bb_call_frequency: {
+                [key: string]: number;
+            };
+        };
+        /** PushFoldSpotResponse */
+        PushFoldSpotResponse: {
+            /** Stack Bb */
+            stack_bb: number;
+            /** Hero Class */
+            hero_class: string;
+            /** Hero Combo */
+            hero_combo: string;
+        };
+        /** RangeParseRequest */
+        RangeParseRequest: {
+            /** Notation */
+            notation: string;
+        };
+        /** RangeParseResponse */
+        RangeParseResponse: {
+            /** Classes */
+            classes: {
+                [key: string]: number;
+            };
+            /** Combo Count */
+            combo_count: number;
+        };
+        /** ValidationError */
+        ValidationError: {
+            /** Location */
+            loc: (string | number)[];
+            /** Message */
+            msg: string;
+            /** Error Type */
+            type: string;
+            /** Input */
+            input?: unknown;
+            /** Context */
+            ctx?: Record<string, never>;
+        };
+    };
     responses: never;
     parameters: never;
     requestBodies: never;
@@ -33,6 +232,158 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    parse_range_ranges_parse_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RangeParseRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RangeParseResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    calculate_equity_equity_calculate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EquityRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EquityResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    solve_push_fold_route_solver_push_fold_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushFoldRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushFoldResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_spot_trainer_push_fold_spot_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushFoldSpotResponse"];
+                };
+            };
+        };
+    };
+    grade_spot_trainer_push_fold_grade_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PushFoldGradeRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PushFoldGradeResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
     health_health_get: {
         parameters: {
             query?: never;

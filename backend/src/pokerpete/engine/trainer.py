@@ -1,0 +1,57 @@
+from __future__ import annotations
+
+import random
+from dataclasses import dataclass
+from typing import Literal
+
+from pokerpete.engine import ranges
+from pokerpete.engine.preflop_equity_matrix import canonical_hand_classes, class_weight
+from pokerpete.engine.preflop_solver import solve_push_fold_cached
+
+Action = Literal["shove", "fold"]
+
+_CLASSES = canonical_hand_classes()
+_CLASS_WEIGHTS = [class_weight(c) for c in _CLASSES]
+
+
+@dataclass(frozen=True)
+class PushFoldSpot:
+    stack_bb: float
+    hero_class: str
+    hero_combo: str
+
+
+@dataclass(frozen=True)
+class PushFoldGrade:
+    correct: bool
+    correct_action: Action
+    shove_frequency: float
+
+
+def random_push_fold_spot(
+    *,
+    min_stack_bb: int = 2,
+    max_stack_bb: int = 40,
+    rng: random.Random | None = None,
+) -> PushFoldSpot:
+    """A random SB shove/fold decision: a hand (weighted by real combo
+    frequency) at a random whole-number stack depth. Whole-number depths
+    keep repeated spots landing on the same `solve_push_fold_cached` entries,
+    which matters since a single solve costs roughly a second."""
+    rng = rng if rng is not None else random.Random()
+    hero_class = rng.choices(_CLASSES, weights=_CLASS_WEIGHTS, k=1)[0]
+    combo = rng.choice(list(ranges.parse(hero_class).keys()))
+    hero_combo = "".join(str(card) for card in sorted(combo, key=lambda c: (-c.rank, -c.suit)))
+    stack_bb = float(rng.randint(min_stack_bb, max_stack_bb))
+    return PushFoldSpot(stack_bb=stack_bb, hero_class=hero_class, hero_combo=hero_combo)
+
+
+def grade_push_fold(stack_bb: float, hero_class: str, action: Action) -> PushFoldGrade:
+    solution = solve_push_fold_cached(stack_bb)
+    shove_frequency = solution.sb_shove_frequency[hero_class]
+    correct_action: Action = "shove" if shove_frequency >= 0.5 else "fold"
+    return PushFoldGrade(
+        correct=action == correct_action,
+        correct_action=correct_action,
+        shove_frequency=shove_frequency,
+    )

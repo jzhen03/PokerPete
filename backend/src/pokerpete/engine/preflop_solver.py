@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from dataclasses import dataclass
+from functools import lru_cache
 
-from pokerpete.engine.preflop_equity_matrix import class_weight
+from pokerpete.engine.preflop_equity_matrix import class_weight, load_matrix
 
 # Both players have already posted their blind; folding forfeits only that
 # blind, which is what these EVs are measured against.
@@ -104,3 +105,18 @@ def solve_push_fold(
         bb_call_frequency=avg_bb,
         iterations=iterations,
     )
+
+
+@lru_cache(maxsize=1)
+def _default_matrix() -> Mapping[str, Mapping[str, float]]:
+    return load_matrix()
+
+
+@lru_cache(maxsize=512)
+def solve_push_fold_cached(stack_bb: float, iterations: int = 300) -> PushFoldSolution:
+    """Memoized convenience wrapper around `solve_push_fold` using the
+    committed equity matrix artifact. A single solve takes roughly a second,
+    so callers issuing repeated requests at the same stack depth (the API
+    layer, the trainer) should go through this rather than `solve_push_fold`
+    directly."""
+    return solve_push_fold(_default_matrix(), stack_bb, iterations=iterations)

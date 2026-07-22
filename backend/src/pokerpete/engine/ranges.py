@@ -6,7 +6,7 @@ from types import MappingProxyType
 
 import eval7
 
-from pokerpete.engine.cards import Card
+from pokerpete.engine.cards import RANKS, Card
 
 Combo = frozenset[Card]
 Range = Mapping[Combo, float]
@@ -67,3 +67,31 @@ def scale(range_: Range, factor: float) -> Range:
 def combo_count(range_: Range) -> float:
     """Total weighted combo count (e.g. AA at full weight contributes 6)."""
     return sum(range_.values())
+
+
+def hand_class_of(combo: Combo) -> str:
+    """Canonical starting-hand notation ('AA', 'AKs', 'AKo') for a combo."""
+    high, low = sorted(combo, key=lambda c: c.rank, reverse=True)
+    if high.rank == low.rank:
+        return RANKS[high.rank] * 2
+    suited = "s" if high.suit == low.suit else "o"
+    return RANKS[high.rank] + RANKS[low.rank] + suited
+
+
+def _combos_in_class(hand_class: str) -> int:
+    if len(hand_class) == 2:  # pocket pair, e.g. "AA"
+        return 6
+    return 4 if hand_class[2] == "s" else 12
+
+
+def class_weights(range_: Range) -> dict[str, float]:
+    """Aggregate a combo-level Range into per-hand-class average weights in
+    [0, 1] (e.g. 2 of AKs's 4 combos present at full weight -> 0.5), suitable
+    for rendering a 13x13 range grid."""
+    totals: dict[str, float] = {}
+    for combo, weight in range_.items():
+        hand_class = hand_class_of(combo)
+        totals[hand_class] = totals.get(hand_class, 0.0) + weight
+    return {
+        hand_class: total / _combos_in_class(hand_class) for hand_class, total in totals.items()
+    }
