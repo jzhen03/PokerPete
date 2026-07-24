@@ -163,6 +163,48 @@ button.secondary {
   font-size: 13px;
 }
 
+.equity-visual {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.equity-hands {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hand-display {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hand-display-label {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.vs-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.range-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 60px;
+  padding: 0 10px;
+  border: 1px dashed var(--gridline);
+  border-radius: 6px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
 .stat-row {
   display: flex;
   gap: 24px;

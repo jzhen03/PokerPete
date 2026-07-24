@@ -1,5 +1,33 @@
 import { useState } from "react";
 import { api, unwrap } from "../../api/client";
+import { CardRow } from "../PlayingCard/PlayingCard";
+import { parseCardList, parseExactHand } from "../../lib/cards";
+
+function HandDisplay({ label, value }: { label: string; value: string }) {
+  const cards = parseExactHand(value);
+  return (
+    <div className="hand-display">
+      <span className="hand-display-label">{label}</span>
+      {cards ? <CardRow cards={cards} /> : <span className="range-badge">{value || "—"}</span>}
+    </div>
+  );
+}
+
+function BoardDisplay({ value }: { value: string }) {
+  const cards = parseCardList(value);
+  return (
+    <div className="hand-display">
+      <span className="hand-display-label">Board</span>
+      {cards === null ? (
+        <span className="range-badge">{value}</span>
+      ) : cards.length > 0 ? (
+        <CardRow cards={cards} />
+      ) : (
+        <span className="range-badge">preflop</span>
+      )}
+    </div>
+  );
+}
 
 export function EquityPanel() {
   const [hero, setHero] = useState("AsAd");
@@ -50,6 +78,15 @@ export function EquityPanel() {
         <button className="primary" onClick={calculate} disabled={loading}>
           {loading ? "Calculating…" : "Calculate"}
         </button>
+      </div>
+
+      <div className="equity-visual">
+        <div className="equity-hands">
+          <HandDisplay label="Hero" value={hero} />
+          <span className="vs-label">vs</span>
+          <HandDisplay label="Villain" value={villain} />
+        </div>
+        <BoardDisplay value={board} />
       </div>
 
       {error && <p className="error-text">{error}</p>}
