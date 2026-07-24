@@ -1,7 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api, unwrap } from "../../api/client";
 import { CardRow } from "../PlayingCard/PlayingCard";
 import { parseCardList, parseExactHand } from "../../lib/cards";
+
+const VALID_BOARD_LENGTHS = new Set([0, 3, 4, 5]);
 
 function HandDisplay({ label, value }: { label: string; value: string }) {
   const cards = parseExactHand(value);
@@ -39,21 +41,43 @@ export function EquityPanel() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  async function calculate() {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await api.POST("/equity/calculate", {
-        body: { hero, villain, board, iterations: 5000 },
-      });
-      setResult(unwrap(response));
-    } catch (err) {
-      setResult(null);
-      setError(err instanceof Error ? err.message : "failed to calculate equity");
-    } finally {
-      setLoading(false);
+  // Auto-calculates once hero, villain, and board all form a playable state
+  // (board is preflop/flop/turn/river length) -- no manual "Calculate" click
+  // required, mirroring RangeExplorer's live-parse-on-type pattern.
+  useEffect(() => {
+    const heroTrimmed = hero.trim();
+    const villainTrimmed = villain.trim();
+    const boardCards = parseCardList(board);
+    const boardReady = boardCards !== null && VALID_BOARD_LENGTHS.has(boardCards.length);
+
+    if (!heroTrimmed || !villainTrimmed || !boardReady) {
+      return;
     }
-  }
+
+    let cancelled = false;
+    setLoading(true);
+    const timer = setTimeout(async () => {
+      try {
+        const response = await api.POST("/equity/calculate", {
+          body: { hero: heroTrimmed, villain: villainTrimmed, board, iterations: 5000 },
+        });
+        if (cancelled) return;
+        setResult(unwrap(response));
+        setError(null);
+      } catch (err) {
+        if (cancelled) return;
+        setResult(null);
+        setError(err instanceof Error ? err.message : "failed to calculate equity");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }, 400);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [hero, villain, board]);
 
   return (
     <div className="panel">
@@ -75,10 +99,9 @@ export function EquityPanel() {
             onChange={(e) => setBoard(e.target.value)}
           />
         </div>
-        <button className="primary" onClick={calculate} disabled={loading}>
-          {loading ? "Calculating…" : "Calculate"}
-        </button>
       </div>
+
+      {loading && <p className="equity-status">Calculating…</p>}
 
       <div className="equity-visual">
         <div className="equity-hands">
