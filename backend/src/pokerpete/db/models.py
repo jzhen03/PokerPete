@@ -23,3 +23,28 @@ class SolverResult(Base):
     computed_at: Mapped[datetime] = mapped_column(
         DateTime, default=lambda: datetime.now(UTC)
     )
+
+
+class SavedRange(Base):
+    """Saved/named ranges (the `ranges` table docs/architecture.md planned
+    but never implemented). classes_json is always populated (the actual
+    weights to render on reload); notation stays nullable since
+    predictor-originated rows have no notation to re-derive combos from --
+    it's only set for notation-originated saves (e.g. a future Range
+    Explorer save button)."""
+
+    __tablename__ = "ranges"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(index=True)
+    source: Mapped[str]  # "predictor" | "notation"
+    classes_json: Mapped[str]  # hand-class -> weight, always populated
+    notation: Mapped[str | None] = mapped_column(default=None)
+    position: Mapped[str | None] = mapped_column(default=None)
+    tags: Mapped[str | None] = mapped_column(default=None)  # comma-separated
+    factors_json: Mapped[str | None] = mapped_column(
+        default=None
+    )  # RangePredictorInputs, when source == "predictor"
+    created_at: Mapped[datetime] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )

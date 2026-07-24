@@ -21,6 +21,58 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/ranges": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List Ranges */
+        get: operations["list_ranges_ranges_get"];
+        put?: never;
+        /** Save Range */
+        post: operations["save_range_ranges_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ranges/{range_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Range */
+        get: operations["get_range_ranges__range_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/ranges/predict": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Predict Range */
+        post: operations["predict_range_ranges_predict_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/equity/calculate": {
         parameters: {
             query?: never;
@@ -315,6 +367,138 @@ export interface components {
             /** Combo Count */
             combo_count: number;
         };
+        /** RangePredictRequest */
+        RangePredictRequest: {
+            /**
+             * Position
+             * @enum {string}
+             */
+            position: "SB" | "BB";
+            /**
+             * Action
+             * @enum {string}
+             */
+            action: "open" | "threebet" | "fourbet" | "coldcall" | "limp";
+            /**
+             * Player Type
+             * @enum {string}
+             */
+            player_type: "loose_passive" | "tight_passive" | "loose_aggressive" | "tight_aggressive" | "balanced";
+            /** Sizing Bucket */
+            sizing_bucket?: ("small" | "medium" | "large") | null;
+            /** Reliability */
+            reliability?: number | null;
+        };
+        /** RangePredictResponse */
+        RangePredictResponse: {
+            /** Classes */
+            classes: {
+                [key: string]: number;
+            };
+            /** Combo Count */
+            combo_count: number;
+            /** Stages */
+            stages: components["schemas"]["RangeStage"][];
+            /** Reliability Used */
+            reliability_used: number;
+            /** Reliability Default */
+            reliability_default: number;
+            /** Reliability Is Customized */
+            reliability_is_customized: boolean;
+        };
+        /** RangeStage */
+        RangeStage: {
+            /** Name */
+            name: string;
+            /** Classes */
+            classes: {
+                [key: string]: number;
+            };
+            /** Added */
+            added: {
+                [key: string]: number;
+            };
+            /** Removed */
+            removed: {
+                [key: string]: number;
+            };
+            /** Reweighted */
+            reweighted: {
+                [key: string]: [
+                    number,
+                    number
+                ];
+            };
+        };
+        /** SavedRangeCreate */
+        SavedRangeCreate: {
+            /** Name */
+            name: string;
+            /**
+             * Source
+             * @default predictor
+             * @enum {string}
+             */
+            source: "predictor" | "notation";
+            /** Classes */
+            classes: {
+                [key: string]: number;
+            };
+            /** Notation */
+            notation?: string | null;
+            /** Position */
+            position?: string | null;
+            /** Tags */
+            tags?: string[] | null;
+            /** Factors */
+            factors?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** SavedRangeDetail */
+        SavedRangeDetail: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /** Source */
+            source: string;
+            /** Position */
+            position: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Classes */
+            classes: {
+                [key: string]: number;
+            };
+            /** Combo Count */
+            combo_count: number;
+            /** Notation */
+            notation: string | null;
+            /** Factors */
+            factors: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** SavedRangeSummary */
+        SavedRangeSummary: {
+            /** Id */
+            id: number;
+            /** Name */
+            name: string;
+            /** Source */
+            source: string;
+            /** Position */
+            position: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
         /** TreeGradeRequest */
         TreeGradeRequest: {
             /** Stack Bb */
@@ -394,6 +578,123 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["RangeParseResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_ranges_ranges_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedRangeSummary"][];
+                };
+            };
+        };
+    };
+    save_range_ranges_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SavedRangeCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedRangeSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_range_ranges__range_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                range_id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedRangeDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    predict_range_ranges_predict_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RangePredictRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RangePredictResponse"];
                 };
             };
             /** @description Validation Error */

@@ -3,10 +3,12 @@ import { useState } from "react";
 import { api, unwrap } from "./api/client";
 import { EquityPanel } from "./components/EquityPanel/EquityPanel";
 import { RangeExplorer } from "./components/RangeExplorer/RangeExplorer";
+import { RangePredictor } from "./components/RangePredictor/RangePredictor";
 import { Trainer } from "./components/Trainer/Trainer";
 
 const TABS = [
   { id: "ranges", label: "Range Explorer" },
+  { id: "predictor", label: "Range Predictor" },
   { id: "equity", label: "Equity" },
   { id: "trainer", label: "Push/Fold Trainer" },
 ] as const;
@@ -45,6 +47,7 @@ function App() {
       </div>
 
       {tab === "ranges" && <RangeExplorer />}
+      {tab === "predictor" && <RangePredictor />}
       {tab === "equity" && <EquityPanel />}
       {tab === "trainer" && <Trainer />}
     </main>
